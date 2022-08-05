@@ -9,13 +9,14 @@ import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTableList, faMagnifyingGlassPlus, faMagnifyingGlassMinus } from '@fortawesome/free-solid-svg-icons';
 import { Icon } from 'leaflet';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const Map = props => {
 
     const { 
         companies,
         handleToggleMenu,
+        leafletRef,
         mapRef
     } = useMemo(() => props, [props]);
 
@@ -34,7 +35,7 @@ const Map = props => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <Companies data={ companies } />
+                <Companies data={ companies } handleToggleMenu={ handleToggleMenu } leafletRef={ leafletRef } />
             </MapContainer>
         </div>
     )
@@ -43,47 +44,75 @@ const Map = props => {
 
 const Companies = props => {
 
-    const { data } = props;
+    const { data, handleToggleMenu, leafletRef } = props;
+
+    const [ currentLayers, setcurrentLayers ] = useState([]);
 
     const map = useMap();
+    leafletRef.current = map;
+
+    const timeoutRef = useRef(null);
 
     useEffect(() => {
 
-        const markers = L.markerClusterGroup();
-        data.forEach(company => {
-            
-            const { latitude: lat, longitude: lng } = company.location;
-            
-            const {
-                address,
-                company: name,
-                // fees,
-                // id,
-                // sector,
-                // stockSymbol
-            } = company;
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
 
-            const marker = L.marker([lat, lng], {
-                icon: new Icon({ iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41]})
-            });
-
-            const popup = L.popup()
-                .setLatLng([lat, lng])
-                .setContent(
-                    `
-                    <p class="title">${name}</p>
-                    <p>${address}</p>
-                    `
-                )
-
-            marker.bindPopup(popup);
+        timeoutRef.current = setTimeout(() => {
         
-            markers.addLayer(marker);
-        })
+            if (currentLayers.length > 0) {
+                currentLayers.forEach(layer => {
+                    map.removeLayer(layer);
+                });
+            } 
 
-        map.addLayer(markers);
+            const markers = L.markerClusterGroup();
 
-    }, [data, map])
+            data.forEach(company => {
+                
+                const { latitude: lat, longitude: lng } = company.location;
+                
+                const { id } = company;
+
+                const marker = L.marker([lat, lng], {
+                    icon: new Icon({ iconUrl: markerIconPng,
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41]}),
+                    interactive: true
+                });
+
+                marker.addEventListener('click', e => {
+                    const menu = document.getElementById('menu');
+                    const tableRows = document.querySelectorAll('.company-data');
+                    const tableElement = document.getElementById(id);
+
+                    tableRows.forEach(row => row.classList.remove('selected'));
+
+                    tableElement.classList.add('selected');
+
+                    if (!menu.classList.contains('open')) {
+                        handleToggleMenu();
+                    }
+
+                    menu.scrollTo({
+                        top: tableElement.offsetTop - 32,
+                        left: 0,
+                        behaviour: 'smooth'
+                    })
+                });
+            
+                markers.addLayer(marker);
+
+                setcurrentLayers([...currentLayers, markers])
+            })
+
+            map.addLayer(markers);
+
+        }, 1000)
+        
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, handleToggleMenu, map])
 
 }
 

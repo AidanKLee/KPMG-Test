@@ -7,6 +7,7 @@
   background-color: transparent;
   border: 0 none transparent;
   font-family: inherit;
+  scroll-behavior: smooth;
 }
 
 html {

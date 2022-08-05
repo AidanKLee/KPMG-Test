@@ -28,3 +28,12 @@
 .popup p {
     margin: 0 0 .5rem 0;
 }
+
+table .selected {
+    background-color: var(--bs-primary);
+    color: white !important;
+}
+
+table .selected * {
+    color: white !important;
+}

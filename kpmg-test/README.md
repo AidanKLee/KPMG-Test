@@ -16,7 +16,3 @@
     <li>React Leaflet</li>
     <li>GeoNames API - GeoLocation</li>
 </ul>
-
-<h3>Project Duration</h3>
-
-<p>This project will need to be finished by 05/07/22 but should not take much longer than 90 minutes to complete the basic functionality.</p>
