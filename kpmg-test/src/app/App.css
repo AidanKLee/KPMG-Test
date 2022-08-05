@@ -1,0 +1,56 @@
+#app #controls {
+    position: absolute; z-index: 1000;
+    top: 0; left: 0;
+    margin: 1rem 0 0 1rem;
+}
+
+#app #controls > .btn {
+    display: block;
+    height: 48px;
+    width: 48px;
+    margin-bottom: .5rem;
+}
+
+#menu {
+    height: 0;
+    overflow-y: scroll;
+    transition: .2s;
+}
+
+#menu.open {
+    height: 50vh;
+}
+
+#menu.open.fullscreen {
+    height: 100vh;
+}
+
+#menu-header {
+    top: 0;
+    background-color: white;
+    position: sticky;
+    padding: .5rem;
+    display: flex;
+    justify-content: space-between;
+    z-index: 5;
+}
+
+#menu-header > .left > button {
+    margin-right: .5rem
+}
+
+#menu-header > .right > button {
+    margin-left: .5rem
+}
+
+#menu thead {
+    background-color: white;
+    position: sticky;
+    top: 47px;
+    z-index: 4;
+    box-shadow: 2px 0 2px var(--bs-gray-500);
+}
+
+#menu tbody {
+    font-size: .8rem;
+}
